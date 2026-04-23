@@ -186,10 +186,10 @@ class ExplosionPower(Power):
                 if dist > 0:
                     force_mag = 1000 / dist
                     angle = math.atan2(body.position.y - y, body.position.x - x)
-                    body.apply_impulse((
+                    body.apply_impulse_at_world_point((
                         math.cos(angle) * force_mag,
                         math.sin(angle) * force_mag
-                    ))
+                    ), body.position)
                     
     def update(self, game, particles):
         pass

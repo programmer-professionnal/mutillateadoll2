@@ -155,10 +155,10 @@ class Explosive(Tool):
                 if dist < self.range_val:
                     force_mag = self.damage * (1 - dist / self.range_val)
                     angle = math.atan2(body.position.y - self.y, body.position.x - self.x)
-                    body.apply_impulse((
+                    body.apply_impulse_at_world_point((
                         math.cos(angle) * force_mag,
                         math.sin(angle) * force_mag
-                    ))
+                    ), body.position)
                     
         if particles:
             particles.emit_fire(self.x, self.y, 20)

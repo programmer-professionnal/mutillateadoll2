@@ -280,10 +280,10 @@ class Game:
                                 if dist < 50:
                                     force = 20
                                     angle = math.atan2(body.position.y - mouse_y, body.position.x - mouse_x)
-                                    body.apply_impulse((
+                                    body.apply_impulse_at_world_point((
                                         math.cos(angle) * force,
                                         math.sin(angle) * force
-                                    ))
+                                    ), body.position)
                                     if self.options.get('blood', True):
                                         self.particles.emit_blood(body.position.x, body.position.y, 5)
             

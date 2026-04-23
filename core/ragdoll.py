@@ -165,7 +165,7 @@ class Ragdoll:
             if abs(current_x - target_x) > 2:
                 force = (target_x - current_x) * 0.5
                 for body in self.bodies:
-                    body.apply_force_at_center((force * 0.1, 0))
+                    body.apply_force((force * 0.1, 0))
                     
     def render(self, screen, camera_offset):
         for shape in self.shapes:
@@ -204,9 +204,9 @@ class Ragdoll:
     def apply_force(self, force, point=None):
         for body in self.bodies:
             if point:
-                body.apply_force_at_local_point(force, point)
+                body.apply_force(force, point)
             else:
-                body.apply_force_at_center(force)
+                body.apply_force(force)
                 
     def get_position(self):
         if self.torso:

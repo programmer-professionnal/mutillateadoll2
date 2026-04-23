@@ -280,7 +280,7 @@ class Game:
                                 if dist < 50:
                                     force = 20
                                     angle = math.atan2(body.position.y - mouse_y, body.position.x - mouse_x)
-                                    body.apply_impulse_at_center((
+                                    body.apply_impulse((
                                         math.cos(angle) * force,
                                         math.sin(angle) * force
                                     ))

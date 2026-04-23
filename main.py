@@ -138,7 +138,7 @@ class Game:
             elif event.type == pygame.MOUSEMOTION:
                 if self.dragging and self.dragged_object:
                     pos = pygame.mouse.get_pos()
-                    self.dragged_object.body.position = pymunk.Vec2d(
+                    self.dragged_object.position = pymunk.Vec2d(
                         pos[0] - self.camera_offset[0],
                         pos[1] - self.camera_offset[1]
                     )

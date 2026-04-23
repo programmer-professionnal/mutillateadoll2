@@ -49,9 +49,9 @@ class Game:
         self.current_tool_name = 'knife'
         self.current_tool_index = 0
         self.tool_category_weapons = {
-            'Melee': ['knife', 'sword', 'axe', 'machete', 'bat', 'chain', 'hammer'],
-            'Firearm': ['pistol', 'rifle', 'shotgun', 'smg', 'sniper', 'rocket_launcher'],
-            'Explosive': ['grenade', 'c4', 'dynamite', 'mine', 'nuke'],
+            'Cuerpo a Cuerpo': ['knife', 'sword', 'axe', 'machete', 'bat', 'chain', 'hammer'],
+            'Armas de Fuego': ['pistol', 'rifle', 'shotgun', 'smg', 'sniper', 'rocket_launcher'],
+            'Explosivos': ['grenade', 'c4', 'dynamite', 'mine', 'nuke'],
         }
         self.tool_category_powers = ['fire', 'ice', 'electricity', 'gravity', 'wind', 'transmute', 'shockwave', 'regenerate', 'spawn']
         
@@ -310,13 +310,13 @@ class Game:
         
         new_button = pygame.Rect(start_x, start_y, button_width, button_height)
         pygame.draw.rect(self.screen, COLORS['ui_selected'], new_button)
-        new_text = self.font.render("NEW GAME", True, COLORS['ui_text'])
+        new_text = self.font.render("NUEVO JUEGO", True, COLORS['ui_text'])
         new_text_rect = new_text.get_rect(center=new_button.center)
         self.screen.blit(new_text, new_text_rect)
         
         quit_button = pygame.Rect(start_x, start_y + 70, button_width, button_height)
         pygame.draw.rect(self.screen, COLORS['ui_background'], quit_button)
-        quit_text = self.font.render("QUIT", True, COLORS['ui_text'])
+        quit_text = self.font.render("SALIR", True, COLORS['ui_text'])
         quit_text_rect = quit_text.get_rect(center=quit_button.center)
         self.screen.blit(quit_text, quit_text_rect)
         
@@ -336,18 +336,18 @@ class Game:
         self.screen.blit(title, (20, 20))
         
         instructions = [
-            "Controls:",
-            "N - New Ragdoll",
-            "F5 - Reset",
-            "1 - Melee Weapons",
-            "2 - Firearms",
-            "3 - Explosives",
-            "4 - Activate Power",
-            "5 - Use Power",
-            "Click - Attack",
-            "Left/Right - Change Weapon",
-            "Arrow/WASD - Move",
-            "Scroll - Zoom",
+            "Controles:",
+            "N - Nuevo Ragdoll",
+            "F5 - Reiniciar",
+            "1 - Armas Cuerpo a Cuerpo",
+            "2 - Armas de Fuego",
+            "3 - Explosivos",
+            "4 - Activar Poder",
+            "5 - Usar Poder",
+            "Click - Atacar",
+            "Izquierda/Derecha - Cambiar",
+            "Flechas/WASD - Mover",
+            "Rueda Raton - Zoom",
             "ESC - Menu",
         ]
         

@@ -28,7 +28,7 @@ class Power:
 
 class FirePower(Power):
     def __init__(self):
-        super().__init__("Fire", "Burn objects and ragdolls", 0, 1)
+        super().__init__("Fuego", "Quemar objetos y ragdolls", 0, 1)
         self.color = (255, 100, 0)
         
     def activate(self, x, y, game):
@@ -48,7 +48,7 @@ class FirePower(Power):
 
 class IcePower(Power):
     def __init__(self):
-        super().__init__("Ice", "Freeze objects and create ice walls", 0, 0)
+        super().__init__("Hielo", "Congelar objetos y crear paredes de hielo", 0, 0)
         self.color = (150, 200, 255)
         self.frozen_bodies = []
         
@@ -67,7 +67,7 @@ class IcePower(Power):
 
 class ElectricityPower(Power):
     def __init__(self):
-        super().__init__("Electricity", "Electrocute objects and activate motors", 0, 1)
+        super().__init__("Electricidad", "Electrocutar objetos y activar motores", 0, 1)
         self.color = (100, 150, 255)
         self.arc_positions = []
         
@@ -88,14 +88,14 @@ class ElectricityPower(Power):
                                 
                                 if len(self.arc_positions) > 5:
                                     self.arc_positions.clear()
-                                    
+                                            
     def render(self, screen, camera_offset):
         pass
 
 
 class GravityPower(Power):
     def __init__(self):
-        super().__init__("Gravity", "Manipulate world gravity", 0, 0)
+        super().__init__("Gravedad", "Manipular la gravedad mundial", 0, 0)
         self.original_gravity = (0, 900)
         self.modified = False
         
@@ -115,7 +115,7 @@ class GravityPower(Power):
 
 class WindPower(Power):
     def __init__(self):
-        super().__init__("Wind", "Create wind currents", 0, 1)
+        super().__init__("Viento", "Crear corrientes de aire", 0, 1)
         self.color = (200, 200, 200)
         self.wind_force = 5
         
@@ -127,7 +127,7 @@ class WindPower(Power):
             for ragdoll in game.ragdolls:
                 for body in ragdoll.bodies:
                     force = (self.wind_force * random.uniform(-1, 1), -self.wind_force)
-                    body.apply_force_at_center(force)
+                    body.apply_force_at_world_point(force, body.position)
                     
             if random.random() < 0.2:
                 particles.add_particle(
@@ -148,14 +148,13 @@ class WindPower(Power):
 
 class TransmutePower(Power):
     def __init__(self):
-        super().__init__("Transmute", "Convert objects into other materials", 0, 0)
+        super().__init__("Transmutar", "Convertir objetos en otros materiales", 0, 0)
         self.transmutation_targets = [
-            ("Gold", (255, 215, 0)),
-            ("Silver", (192, 192, 192)),
+            ("Oro", (255, 215, 0)),
+            ("Plata", (192, 192, 192)),
             ("Pizza", (255, 200, 100)),
-            ("Cookies", (210, 180, 140)),
-            ("Cookies!", (139, 69, 19)),
-            ("Money", (50, 200, 50)),
+            ("Galletas", (210, 180, 140)),
+            ("Dinero", (50, 200, 50)),
         ]
         self.current_index = 0
         
@@ -177,7 +176,7 @@ class TransmutePower(Power):
 
 class ExplosionPower(Power):
     def __init__(self):
-        super().__init__("Shockwave", "Create explosive shockwaves", 0, 0)
+        super().__init__("Explosion", "Crear ondas de choque", 0, 0)
         
     def activate(self, x, y, game):
         for ragdoll in game.ragdolls:
@@ -200,7 +199,7 @@ class ExplosionPower(Power):
 
 class XRayPower(Power):
     def __init__(self):
-        super().__init__("X-Ray", "See internal structures", 0, 0)
+        super().__init__("Rayos X", "Ver estructuras internas", 0, 0)
         
     def activate(self, x, y, game):
         pass
@@ -214,7 +213,7 @@ class XRayPower(Power):
 
 class RegeneratePower(Power):
     def __init__(self):
-        super().__init__("Regenerate", "Restore damaged ragdolls", 0, 0)
+        super().__init__("Regenerar", "Restaurar ragdolls dañados", 0, 0)
         
     def activate(self, x, y, game):
         for ragdoll in game.ragdolls[:]:
@@ -223,9 +222,9 @@ class RegeneratePower(Power):
         
         from core.ragdoll import Ragdoll
         for _ in range(3):
-            x = random.randint(200, SCREEN_WIDTH - 200)
-            y = random.randint(200, SCREEN_HEIGHT - 200)
-            game.ragdolls.append(Ragdoll(game.space, x, y))
+            x_pos = random.randint(200, SCREEN_WIDTH - 200)
+            y_pos = random.randint(200, SCREEN_HEIGHT - 200)
+            game.ragdolls.append(Ragdoll(game.space, x_pos, y_pos))
             
     def update(self, game, particles):
         pass
@@ -236,7 +235,7 @@ class RegeneratePower(Power):
 
 class MutatePower(Power):
     def __init__(self):
-        super().__init__("Mutate", "Transform ragdolls into monsters", 0, 0)
+        super().__init__("Mutar", "Transformar ragdolls en monstruos", 0, 0)
         
     def activate(self, x, y, game):
         for ragdoll in game.ragdolls:
@@ -252,7 +251,7 @@ class MutatePower(Power):
 
 class SpawnPower(Power):
     def __init__(self):
-        super().__init__("Spawn", "Spawn new ragdolls", 0, 0)
+        super().__init__("Spawn", "Crear nuevos ragdolls", 0, 0)
         
     def activate(self, x, y, game):
         from core.ragdoll import Ragdoll
@@ -267,7 +266,7 @@ class SpawnPower(Power):
 
 class GodPower(Power):
     def __init__(self):
-        super().__init__("God Mode", "Make ragdolls invincible", 0, 0)
+        super().__init__("Dios", "Hacer ragdolls invencibles", 0, 0)
         
     def activate(self, x, y, game):
         pass

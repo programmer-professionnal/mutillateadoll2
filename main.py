@@ -336,32 +336,21 @@ class Game:
         self.render_hud()
         
     def render_hud(self):
-        hud_rect = pygame.Rect(0, 0, 200, 40)
-        pygame.draw.rect(self.screen, (0, 0, 0, 180), hud_rect)
-        
-        title = self.font.render("Mutillateadoll2", True, COLORS['ui_text'])
-        self.screen.blit(title, (10, 10))
-        
-        hud_rect2 = pygame.Rect(0, SCREEN_HEIGHT - 180, 200, 180)
-        pygame.draw.rect(self.screen, (0, 0, 0, 180), hud_rect2)
+        title_surf = self.font.render("Mutillateadoll2", True, (200, 200, 200))
+        self.screen.blit(title_surf, (15, 12))
         
         instructions = [
-            "Controles:",
-            "N - Nuevo Ragdoll",
-            "F5 - Reiniciar",
-            "1 - Armas Cuerpo a Cuerpo",
-            "2 - Armas de Fuego",
-            "3 - Explosivos",
-            "4 - Activar Poder",
-            "5 - Usar Poder",
-            "Click - Atacar/Mover",
-            "Izquierda/Derecha - Cambiar",
-            "ESC - Menu",
+            "[N] Nuevo  [F5] Reiniciar",
+            "[1] Cuerpo [2] Fuego [3] Explosivos",
+            "[4] Poder [5] Usar",
+            "[Click] Mover/Atacar  [|] [>] Cambiar",
+            "[ESC] Menu",
         ]
         
+        y_start = SCREEN_HEIGHT - 130
         for i, text in enumerate(instructions):
-            text_surf = self.small_font.render(text, True, COLORS['ui_text'])
-            self.screen.blit(text_surf, (10, SCREEN_HEIGHT - 170 + i * 16))
+            text_surf = self.small_font.render(text, True, (220, 220, 220))
+            self.screen.blit(text_surf, (15, y_start + i * 20))
             
     def run(self):
         while self.running:

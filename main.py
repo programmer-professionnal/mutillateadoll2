@@ -43,6 +43,7 @@ class Game:
         self.zoom = 1.0
         self.dragging = False
         self.dragged_object = None
+        self.dragged_ragdoll = None
         self.mouse_angle = 0
         
         self.current_tool_category = 0
@@ -161,15 +162,19 @@ class Game:
                 if event.button == 1:
                     self.dragging = False
                     self.dragged_object = None
+                    self.dragged_ragdoll = None
                     self.mouse_pressed = False
                     
             elif event.type == pygame.MOUSEMOTION:
-                if self.dragging and self.dragged_object:
+                if self.dragging and self.dragged_ragdoll:
                     pos = pygame.mouse.get_pos()
-                    self.dragged_object.position = pymunk.Vec2d(
-                        pos[0] - self.camera_offset[0],
-                        pos[1] - self.camera_offset[1]
-                    )
+                    mouse_x = pos[0] - self.camera_offset[0]
+                    mouse_y = pos[1] - self.camera_offset[1]
+                    
+                    for body in self.dragged_ragdoll.bodies:
+                        dx = mouse_x - body.position.x
+                        dy = mouse_y - body.position.y
+                        body.apply_force_at_world_point((dx * 5, dy * 5), body.position)
                     
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
@@ -202,9 +207,9 @@ class Game:
         
         for ragdoll in self.ragdolls:
             for body in ragdoll.bodies:
-                if body.position.get_distance((mouse_x, mouse_y)) < 30:
+                if body.position.get_distance((mouse_x, mouse_y)) < 40:
                     self.dragging = True
-                    self.dragged_object = body
+                    self.dragged_ragdoll = ragdoll
                     return
                     
     def spawn_ragdoll(self, x=None, y=None):

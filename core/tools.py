@@ -133,6 +133,8 @@ class Explosive(Tool):
         self.timer = delay
         self.exploded = False
         self.color = (80, 80, 80)
+        self.x = 0
+        self.y = 0
         
     def use(self, x, y, angle, game, particles):
         self.x = x

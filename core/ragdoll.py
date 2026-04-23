@@ -169,20 +169,30 @@ class Ragdoll:
                     
     def render(self, screen, camera_offset):
         for shape in self.shapes:
-            if isinstance(shape, pymunk.Circle):
-                center = shape.body.position + shape.offset
-                pos = (int(center.x - camera_offset[0]), int(center.y - camera_offset[1]))
-                radius = int(shape.radius)
-                color = shape.color if hasattr(shape, 'color') else self.skin_color
-                pygame.draw.circle(screen, color, pos, radius)
-                pygame.draw.circle(screen, (50, 40, 35), pos, radius, 1)
-                
-            elif isinstance(shape, pymunk.Poly):
-                verts = [shape.body.position + v.rotated(shape.body.angle) for v in shape.get_vertices()]
-                screen_verts = [(int(v.x - camera_offset[0]), int(v.y - camera_offset[1])) for v in verts]
-                color = shape.color if hasattr(shape, 'color') else self.skin_color
-                pygame.draw.polygon(screen, color, screen_verts)
-                pygame.draw.polygon(screen, (50, 40, 35), screen_verts, 1)
+            try:
+                if shape.body is None:
+                    continue
+                if isinstance(shape, pymunk.Circle):
+                    center = shape.body.position + shape.offset
+                    pos = (int(center.x - camera_offset[0]), int(center.y - camera_offset[1]))
+                    if pos[0] < -100 or pos[0] > SCREEN_WIDTH + 100 or pos[1] < -100 or pos[1] > SCREEN_HEIGHT + 100:
+                        continue
+                    radius = int(shape.radius)
+                    color = shape.color if hasattr(shape, 'color') else self.skin_color
+                    pygame.draw.circle(screen, color, pos, radius)
+                    pygame.draw.circle(screen, (50, 40, 35), pos, radius, 1)
+                    
+                elif isinstance(shape, pymunk.Poly):
+                    verts = [shape.body.position + v.rotated(shape.body.angle) for v in shape.get_vertices()]
+                    screen_verts = []
+                    for v in verts:
+                        sv = (int(v.x - camera_offset[0]), int(v.y - camera_offset[1]))
+                        screen_verts.append(sv)
+                    color = shape.color if hasattr(shape, 'color') else self.skin_color
+                    pygame.draw.polygon(screen, color, screen_verts)
+                    pygame.draw.polygon(screen, (50, 40, 35), screen_verts, 1)
+            except:
+                continue
 
     def destroy(self):
         for shape in self.shapes:
@@ -212,6 +222,11 @@ class Ragdoll:
         if self.torso:
             return self.torso.position
         return (self.x, self.y)
+        
+    def get_velocity(self):
+        if self.torso:
+            return self.torso.velocity
+        return (0, 0)
         
     def get_velocity(self):
         if self.torso:

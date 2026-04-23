@@ -171,10 +171,20 @@ class Game:
                     mouse_x = pos[0] - self.camera_offset[0]
                     mouse_y = pos[1] - self.camera_offset[1]
                     
+                    min_x = 50
+                    max_x = SCREEN_WIDTH - 50
+                    min_y = 50
+                    max_y = SCREEN_HEIGHT - 50
+                    
+                    mouse_x = max(min_x, min(max_x, mouse_x))
+                    mouse_y = max(min_y, min(max_y, mouse_y))
+                    
+                    center = self.dragged_ragdoll.get_position()
+                    dx = mouse_x - center.x
+                    dy = mouse_y - center.y
+                    
                     for body in self.dragged_ragdoll.bodies:
-                        dx = mouse_x - body.position.x
-                        dy = mouse_y - body.position.y
-                        body.apply_force_at_world_point((dx * 5, dy * 5), body.position)
+                        body.position = (body.position.x + dx, body.position.y + dy)
                     
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:

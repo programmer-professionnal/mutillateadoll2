@@ -3,6 +3,7 @@ import sys
 import json
 import os
 import pymunk
+import math
 
 pygame.init()
 
@@ -44,6 +45,19 @@ class Game:
         self.dragged_object = None
         self.mouse_angle = 0
         
+        self.current_tool_category = 0
+        self.current_tool_name = 'knife'
+        self.current_tool_index = 0
+        self.tool_category_weapons = {
+            'Melee': ['knife', 'sword', 'axe', 'machete', 'bat', 'chain', 'hammer'],
+            'Firearm': ['pistol', 'rifle', 'shotgun', 'smg', 'sniper', 'rocket_launcher'],
+            'Explosive': ['grenade', 'c4', 'dynamite', 'mine', 'nuke'],
+        }
+        self.tool_category_powers = ['fire', 'ice', 'electricity', 'gravity', 'wind', 'transmute', 'shockwave', 'regenerate', 'spawn']
+        
+        self.current_power_active = False
+        self.mouse_pressed = False
+        
         self.font = pygame.font.Font(None, 32)
         self.small_font = pygame.font.Font(None, 24)
         
@@ -63,8 +77,16 @@ class Game:
         self.weapons = create_default_weapons()
         self.powers = create_default_powers()
         
-        self.current_weapon_category = 'Melee'
-        self.current_power_category = 'fire'
+        self.current_tool_name = 'knife'
+        self.current_tool_index = 0
+        self.tool_category_weapons = {
+            'Melee': ['knife', 'sword', 'axe', 'machete', 'bat', 'chain', 'hammer'],
+            'Firearm': ['pistol', 'rifle', 'shotgun', 'smg', 'sniper', 'rocket_launcher'],
+            'Explosive': ['grenade', 'c4', 'dynamite', 'mine', 'nuke'],
+        }
+        self.tool_category_powers = ['fire', 'ice', 'electricity', 'gravity', 'wind', 'transmute', 'shockwave', 'regenerate', 'spawn']
+        
+        self.mouse_pressed = False
         
     def create_boundaries(self):
         ground = pymunk.Segment(self.space.static_body, (50, SCREEN_HEIGHT - 50), (SCREEN_WIDTH - 50, SCREEN_HEIGHT - 50), 5)
@@ -104,20 +126,24 @@ class Game:
                 elif event.key == pygame.K_n and self.state == 'game':
                     self.spawn_ragdoll(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
                 elif event.key == pygame.K_1:
-                    self.current_weapon_category = 'Melee'
+                    self.current_tool_category = 0
+                    self.update_tool()
                 elif event.key == pygame.K_2:
-                    self.current_weapon_category = 'Firearm'
+                    self.current_tool_category = 1
+                    self.update_tool()
                 elif event.key == pygame.K_3:
-                    self.current_weapon_category = 'Explosive'
+                    self.current_tool_category = 2
+                    self.update_tool()
                 elif event.key == pygame.K_4:
-                    self.current_weapon_category = 'Powers'
+                    self.current_power_active = True
                 elif event.key == pygame.K_5:
-                    self.current_weapon_category = 'Build'
-                elif event.key == pygame.K_r:
-                    self.mouse_angle += 15
-                elif event.key == pygame.K_t:
-                    if self.selected_power:
-                        self.selected_power.activate(mouse_x, mouse_y, self)
+                    self.use_current_power()
+                elif event.key == pygame.K_LEFT:
+                    self.current_tool_index = max(0, self.current_tool_index - 1)
+                    self.update_tool()
+                elif event.key == pygame.K_RIGHT:
+                    self.current_tool_index += 1
+                    self.update_tool()
                         
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:
@@ -125,6 +151,7 @@ class Game:
                         self.check_menu_click(mouse_pos)
                     elif self.state == 'game':
                         self.check_game_click(mouse_pos)
+                        self.mouse_pressed = True
                 elif event.button == 4:
                     self.zoom_in()
                 elif event.button == 5:
@@ -134,6 +161,7 @@ class Game:
                 if event.button == 1:
                     self.dragging = False
                     self.dragged_object = None
+                    self.mouse_pressed = False
                     
             elif event.type == pygame.MOUSEMOTION:
                 if self.dragging and self.dragged_object:
@@ -203,6 +231,25 @@ class Game:
     def zoom_out(self):
         self.zoom = max(0.5, self.zoom * 0.9)
         
+    def update_tool(self):
+        categories = list(self.tool_category_weapons.keys())
+        if self.current_tool_category < len(categories):
+            category = categories[self.current_tool_category]
+            tools = self.tool_category_weapons[category]
+            if self.current_tool_index < len(tools):
+                self.current_tool_name = tools[self.current_tool_index]
+                
+    def use_current_power(self):
+        mouse_pos = pygame.mouse.get_pos()
+        mouse_x = mouse_pos[0] - self.camera_offset[0]
+        mouse_y = mouse_pos[1] - self.camera_offset[1]
+        
+        if self.tool_category_powers:
+            power_name = self.tool_category_powers[self.current_tool_index % len(self.tool_category_powers)]
+            power = self.powers.get(power_name)
+            if power:
+                power.activate(mouse_x, mouse_y, self)
+        
     def update(self):
         if self.state == 'game':
             dt = 1.0 / FPS
@@ -215,6 +262,30 @@ class Game:
                 power.update(self, self.particles)
                 
             self.particles.update()
+            
+            if self.mouse_pressed and self.current_tool_name:
+                mouse_pos = pygame.mouse.get_pos()
+                tool = self.weapons.get(self.current_tool_name)
+                if tool:
+                    if hasattr(tool, 'is_projectile') and tool.is_projectile:
+                        pass
+                    elif hasattr(tool, 'is_explosive') and tool.is_explosive:
+                        tool.update(self, self.particles)
+                    else:
+                        mouse_x = mouse_pos[0] - self.camera_offset[0]
+                        mouse_y = mouse_pos[1] - self.camera_offset[1]
+                        for ragdoll in self.ragdolls:
+                            for body in ragdoll.bodies:
+                                dist = body.position.get_distance((mouse_x, mouse_y))
+                                if dist < 50:
+                                    force = 20
+                                    angle = math.atan2(body.position.y - mouse_y, body.position.x - mouse_x)
+                                    body.apply_impulse_at_center((
+                                        math.cos(angle) * force,
+                                        math.sin(angle) * force
+                                    ))
+                                    if self.options.get('blood', True):
+                                        self.particles.emit_blood(body.position.x, body.position.y, 5)
             
     def render(self):
         self.screen.fill(COLORS['background'])
@@ -268,21 +339,21 @@ class Game:
             "Controls:",
             "N - New Ragdoll",
             "F5 - Reset",
-            "1 - Melee",
+            "1 - Melee Weapons",
             "2 - Firearms",
             "3 - Explosives",
-            "4 - Powers",
-            "T - Activate Power",
-            "R - Rotate",
+            "4 - Activate Power",
+            "5 - Use Power",
+            "Click - Attack",
+            "Left/Right - Change Weapon",
             "Arrow/WASD - Move",
             "Scroll - Zoom",
-            "Click+Drag - Move",
             "ESC - Menu",
         ]
         
         for i, text in enumerate(instructions):
             text_surf = self.small_font.render(text, True, COLORS['ui_text'])
-            self.screen.blit(text_surf, (20, 60 + i * 25))
+            self.screen.blit(text_surf, (20, 80 + i * 22))
             
     def run(self):
         while self.running:

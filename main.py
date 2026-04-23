@@ -173,13 +173,13 @@ class Game:
                     
         keys = pygame.key.get_pressed()
         if keys[pygame.K_LEFT] or keys[pygame.K_a]:
-            self.camera_offset[0] -= 10
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
             self.camera_offset[0] += 10
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+            self.camera_offset[0] -= 10
         if keys[pygame.K_UP] or keys[pygame.K_w]:
-            self.camera_offset[1] -= 10
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
             self.camera_offset[1] += 10
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+            self.camera_offset[1] -= 10
             
     def check_menu_click(self, pos):
         button_width = 200

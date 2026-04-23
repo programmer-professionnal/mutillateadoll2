@@ -353,7 +353,7 @@ class Game:
             "5 - Usar Poder",
             "Click - Atacar",
             "Izquierda/Derecha - Cambiar",
-            "Flechas/WASD - Mover",
+            "Flechas - Mover",
             "Rueda Raton - Zoom",
             "ESC - Menu",
         ]

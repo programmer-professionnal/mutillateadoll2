@@ -92,6 +92,9 @@ class Game:
         self.tool_category_powers = ['fire', 'ice', 'electricity', 'gravity', 'wind', 'transmute', 'shockwave', 'regenerate', 'spawn']
         
         self.mouse_pressed = False
+        self.frame_count = 0
+        self.last_hit_frame = 0
+        self.hit_cooldown = 15
         
     def create_boundaries(self):
         ground = pymunk.Segment(self.space.static_body, (50, SCREEN_HEIGHT - 50), (SCREEN_WIDTH - 50, SCREEN_HEIGHT - 50), 5)

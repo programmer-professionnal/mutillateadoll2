@@ -4,6 +4,7 @@ import json
 import os
 import pymunk
 import math
+import random
 
 pygame.init()
 
@@ -232,6 +233,24 @@ class Game:
         self.zoom = 1.0
         self.spawn_ragdoll(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
         
+    def explode_ragdoll(self, ragdoll):
+        head_pos = ragdoll.get_head_position()
+        
+        for body in ragdoll.bodies:
+            force = random.randint(200, 400)
+            angle = random.uniform(0, 6.28)
+            body.apply_impulse_at_world_point((
+                math.cos(angle) * force,
+                math.sin(angle) * force
+            ), body.position)
+        
+        self.particles.emit_fire(head_pos.x, head_pos.y, 30)
+        self.particles.emit_blood(head_pos.x, head_pos.y, 20)
+        self.particles.emit_smoke(head_pos.x, head_pos.y, 15)
+        
+        if hasattr(ragdoll, 'head_shape'):
+            ragdoll.head_shape.color = (80, 20, 20)
+        
     def zoom_in(self):
         self.zoom = min(2.0, self.zoom * 1.1)
         
@@ -281,7 +300,10 @@ class Game:
                     else:
                         mouse_x = mouse_pos[0] - self.camera_offset[0]
                         mouse_y = mouse_pos[1] - self.camera_offset[1]
+                        damage = 15
                         for ragdoll in self.ragdolls:
+                            if not ragdoll.alive:
+                                continue
                             for body in ragdoll.bodies:
                                 dist = body.position.get_distance((mouse_x, mouse_y))
                                 if dist < 50:
@@ -293,6 +315,10 @@ class Game:
                                     ), body.position)
                                     if self.options.get('blood', True):
                                         self.particles.emit_blood(body.position.x, body.position.y, 5)
+                                    
+                                    died = ragdoll.take_damage(damage)
+                                    if died:
+                                        self.explode_ragdoll(ragdoll)
             
     def render(self):
         self.screen.fill(COLORS['background'])

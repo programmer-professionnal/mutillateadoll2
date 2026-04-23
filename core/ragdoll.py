@@ -1,6 +1,7 @@
 import pymunk
 import pygame
 import math
+import random
 
 class Ragdoll:
     def __init__(self, space, x, y):
@@ -11,6 +12,12 @@ class Ragdoll:
         self.shapes = []
         self.joints = []
         self.skin_color = (210, 180, 150)
+        self.head_color = (210, 180, 150)
+        
+        self.max_health = 100
+        self.health = self.max_health
+        self.alive = True
+        self.hit_timer = 0
         
         self.create()
         
@@ -35,6 +42,9 @@ class Ragdoll:
         self.space.add(head, head_s)
         self.bodies.append(head)
         self.shapes.append(head_s)
+        self.head = head
+        self.head_shape = head_s
+        self.head_radius = head_radius
         
         torso = pymunk.Body(8, pymunk.moment_for_box(8, (torso_width, torso_height)))
         torso.position = (torso_x, torso_y)
@@ -168,3 +178,24 @@ class Ragdoll:
         if self.bodies:
             return self.bodies[0].velocity
         return (0, 0)
+    
+    def take_damage(self, amount):
+        if not self.alive:
+            return False
+            
+        self.health -= amount
+        self.hit_timer = 10
+        
+        if self.health <= 0:
+            self.die()
+            return True
+        return False
+    
+    def die(self):
+        self.alive = False
+        self.health = 0
+        
+    def get_head_position(self):
+        if hasattr(self, 'head'):
+            return self.head.position
+        return self.get_position()

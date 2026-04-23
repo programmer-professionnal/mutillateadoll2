@@ -59,6 +59,9 @@ class Game:
         
         self.current_power_active = False
         self.mouse_pressed = False
+        self.mouse_start_pos = None
+        self.last_hit_frame = 0
+        self.hit_cooldown = 15
         
         self.font = pygame.font.Font(None, 32)
         self.small_font = pygame.font.Font(None, 24)
@@ -280,6 +283,7 @@ class Game:
         if self.state == 'game':
             dt = 1.0 / FPS
             self.space.step(dt)
+            self.frame_count += 1
             
             for ragdoll in self.ragdolls:
                 ragdoll.update()
@@ -289,36 +293,31 @@ class Game:
                 
             self.particles.update()
             
-            if self.mouse_pressed and self.current_tool_name:
+            if self.mouse_pressed and not self.dragging and self.frame_count >= self.last_hit_frame + self.hit_cooldown:
                 mouse_pos = pygame.mouse.get_pos()
-                tool = self.weapons.get(self.current_tool_name)
-                if tool:
-                    if hasattr(tool, 'is_projectile') and tool.is_projectile:
-                        pass
-                    elif hasattr(tool, 'is_explosive') and tool.is_explosive:
-                        tool.update(self, self.particles)
-                    else:
-                        mouse_x = mouse_pos[0] - self.camera_offset[0]
-                        mouse_y = mouse_pos[1] - self.camera_offset[1]
-                        damage = 15
-                        for ragdoll in self.ragdolls:
-                            if not ragdoll.alive:
-                                continue
-                            for body in ragdoll.bodies:
-                                dist = body.position.get_distance((mouse_x, mouse_y))
-                                if dist < 50:
-                                    force = 20
-                                    angle = math.atan2(body.position.y - mouse_y, body.position.x - mouse_x)
-                                    body.apply_impulse_at_world_point((
-                                        math.cos(angle) * force,
-                                        math.sin(angle) * force
-                                    ), body.position)
-                                    if self.options.get('blood', True):
-                                        self.particles.emit_blood(body.position.x, body.position.y, 5)
-                                    
-                                    died = ragdoll.take_damage(damage)
-                                    if died:
-                                        self.explode_ragdoll(ragdoll)
+                
+                for ragdoll in self.ragdolls:
+                    if not ragdoll.alive:
+                        continue
+                        
+                    for body in ragdoll.bodies:
+                        dist = body.position.get_distance(mouse_pos)
+                        if dist < 50:
+                            force = 20
+                            angle = math.atan2(body.position.y - mouse_pos[1], body.position.x - mouse_pos[0])
+                            body.apply_impulse_at_world_point((
+                                math.cos(angle) * force,
+                                math.sin(angle) * force
+                            ), body.position)
+                            if self.options.get('blood', True):
+                                self.particles.emit_blood(body.position.x, body.position.y, 5)
+                            
+                            damage = 15
+                            died = ragdoll.take_damage(damage)
+                            if died:
+                                self.explode_ragdoll(ragdoll)
+                            
+                            self.last_hit_frame = self.frame_count
             
     def render(self):
         self.screen.fill(COLORS['background'])

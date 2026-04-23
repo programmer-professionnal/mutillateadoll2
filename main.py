@@ -336,11 +336,14 @@ class Game:
         self.render_hud()
         
     def render_hud(self):
-        hud_rect = pygame.Rect(10, 10, 250, SCREEN_HEIGHT - 20)
-        pygame.draw.rect(self.screen, COLORS['ui_background'], hud_rect)
+        hud_rect = pygame.Rect(0, 0, 200, 40)
+        pygame.draw.rect(self.screen, (0, 0, 0, 180), hud_rect)
         
         title = self.font.render("Mutillateadoll2", True, COLORS['ui_text'])
-        self.screen.blit(title, (20, 20))
+        self.screen.blit(title, (10, 10))
+        
+        hud_rect2 = pygame.Rect(0, SCREEN_HEIGHT - 180, 200, 180)
+        pygame.draw.rect(self.screen, (0, 0, 0, 180), hud_rect2)
         
         instructions = [
             "Controles:",
@@ -351,16 +354,14 @@ class Game:
             "3 - Explosivos",
             "4 - Activar Poder",
             "5 - Usar Poder",
-            "Click - Atacar",
+            "Click - Atacar/Mover",
             "Izquierda/Derecha - Cambiar",
-            "Flechas - Mover",
-            "Rueda Raton - Zoom",
             "ESC - Menu",
         ]
         
         for i, text in enumerate(instructions):
             text_surf = self.small_font.render(text, True, COLORS['ui_text'])
-            self.screen.blit(text_surf, (20, 80 + i * 22))
+            self.screen.blit(text_surf, (10, SCREEN_HEIGHT - 170 + i * 16))
             
     def run(self):
         while self.running:
